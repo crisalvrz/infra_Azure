@@ -7,19 +7,24 @@ La arquitectura implementa una topología de red en estrella (*Hub-and-Spoke*) c
 * **VNet Peering:** Interconexión directa y bidireccional que comunica ambas redes a través del *backbone* privado de alta velocidad de Microsoft, sin necesidad de exponer tráfico a la internet pública.
 * **Network Security Group (NSG):** Firewall por software perimetral asociado a la subred del *Spoke* para restringir el tráfico entrante de manera estricta.
 
-## Importancia
+### Importancia Estratégica y Metodología DevOps (NetDevOps)
 
-En entornos de producción, la arquitectura *Hub-and-Spoke* es un estándar de la industria cloud por varias razones:
+En entornos corporativos, desplegar una arquitectura *Hub-and-Spoke* de forma manual en el portal web es un antipatrón. Este proyecto adopta la metodología **DevOps** (tratando las redes como si fueran software) para garantizar un ciclo de vida eficiente, seguro y automatizado basado en cuatro pilares:
 
-1. **Seguridad y Aislamiento (Zero Trust):** Los entornos de aplicaciones no deben tener comunicación abierta por defecto. Segmentar las VNets permite aislar cargas de trabajo crítcas.
-2. **Control de Accesos con NSG:** Aplicando el principio de mínimo privilegio, se bloquea todo el tráfico entrante al *Spoke* excepto los puertos estrictamente necesarios de servicios web públicos (HTTP 80 y HTTPS 443).
-3. **Infraestructura como Código (IaC):** Automatizar redes mediante Terraform garantiza la repetibilidad del entorno, elimina el factor del error humano en configuraciones manuales de red y permite auditar cambios mediante Git.
-4. **Optimización y Cálculo Dinámico:** El direccionamiento IP no está escrito a fuego (*hardcoded*), sino que utiliza funciones nativas como `cidrsubnet()` para calcular las subredes dinámicamente según los prefijos de red provistos.
+**Infraestructura como Código (IaC):**
+   Todo el diseño de red está definido en archivos de configuración declarativos utilizando **Terraform**. Esto permite versionar la infraestructura en Git, facilitando la auditoría de cambios, el trabajo en equipo y eliminando por completo el factor del error humano o el "drift" (desviación) de configuración típico de los despliegues manuales.
+
+**Idempotencia y Repetibilidad del Entorno:**
+   Gracias al pipeline de Terraform (`init` -> `validate` -> `plan` -> `apply`), el despliegue es completamente idempotente. Podemos replicar exactamente esta misma topología e ID de red en entornos de Desarrollo, Preproducción o Producción en cuestión de segundos, garantizando un comportamiento idéntico en cualquier fase.
+
+**Seguridad Integrada (DevSecOps y Zero Trust):**
+   La seguridad no es una capa posterior, sino que se define en el código desde el primer minuto. Se rompe el concepto de red plana tradicional aplicando aislamiento total entre VNets. Mediante los Network Security Groups (NSG), se implementa el principio de mínimo privilegio, bloqueando todo el tráfico entrante por defecto y abriendo exclusivamente los puertos web requeridos (**HTTP 80** y **HTTPS 443**).
+
+**Optimización y Programación Dinámica de Red:**
+   Huyendo de las configuraciones estáticas (*hardcoding*), el direccionamiento IP se calcula en tiempo de ejecución. El uso de funciones nativas como `cidrsubnet()` permite que la infraestructura escale de forma inteligente y automatizada, recalculando las subredes de manera dinámica en función de las variables de entrada.
 ---
 
 ## 2. Guía
-
-El despliegue se ha realizado de forma íntegra desde un entorno local basado en **Ubuntu Desktop** ejecutando las siguientes fases técnicas:
 
 ### Fase 1: Preparación del Entorno Local
 Instalación de la interfaz de línea de comandos de Azure y descarga del binario nativo de Terraform para configurar las variables de entorno en el sistema.
