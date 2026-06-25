@@ -1,7 +1,5 @@
 Despliegue Automatizado de Red Hub-and-Spoke Segura en Azure con Terraform
 
-Este repositorio contiene la configuración de Infraestructura como Código (IaC) para desplegar una topología de red **Hub-and-Spoke** con segmentación perimetral de seguridad en Microsoft Azure. El proyecto aplica de forma práctica los conceptos de gobernanza, enrutamiento y seguridad exigidos en la certificación **AZ-104**, consolidando las bases de administración de sistemas y redes del ciclo **ASIR**.
-
 1. Descripción
 La arquitectura implementa una topología de red en estrella (*Hub-and-Spoke*) compuesta por:
 * **VNet Hub (Red Central):** Actúa como el núcleo de conectividad de la infraestructura (simulando una oficina central o zona perimetral/DMZ).
